@@ -18,7 +18,7 @@ quip.apps.initialize({
         const rootRecord = quip.apps.getRootRecord();
         if (isCreation) {
             rootRecord.seed();
-            //quip.apps.sendMessage("added a Process Bar");
+            quip.apps.sendMessage("added a Process Bar");
         }
 
         quip.apps.updateToolbarCommandsState([], [rootRecord.get("color")]);

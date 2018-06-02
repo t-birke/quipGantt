@@ -1,3 +1,18 @@
-# Process Bar
+# Gantt Chart
 
-Process Bar allows anyone to change the status of a process or add new steps. This is a simple example of how to use Quip's color scheme, rich text boxes, and commenting.
+Gantt Chart allows anyone to greate a project task hierarchy within a document.
+
+# TODOs on download
+
+after "npm install" you have to add the following piece of code
+```
+{
+    test: /\.css$/,
+    loaders: ['style-loader', 'css-loader'],
+},
+```
+above the
+```
+{test: /\.less$/,"
+```
+
