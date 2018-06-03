@@ -18,18 +18,12 @@ quip.apps.initialize({
         const rootRecord = quip.apps.getRootRecord();
         if (isCreation) {
             rootRecord.seed();
-            quip.apps.sendMessage("added a Process Bar");
+            quip.apps.sendMessage("added a Gantt Chart");
         }
 
         quip.apps.updateToolbarCommandsState([], [rootRecord.get("color")]);
         const ConnectedApp = connectRecord(rootRecord, App);
-        ReactDOM.render(<ConnectedApp/>, rootNode, () => {
-            isCreation &&
-                rootRecord
-                    .get("steps")
-                    .getRecords()[0]
-                    .focus();
-        });
+        ReactDOM.render(<ConnectedApp/>, rootNode, () => {});
     },
     menuCommands: allMenuCommands(),
     toolbarCommandIds: getToolbarCommandIds(),

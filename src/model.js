@@ -7,13 +7,15 @@ class RootRecord extends quip.apps.RootRecord {
     static CONSTRUCTOR_KEY = "Root";
 
     static getProperties = () => ({
-        steps: quip.apps.RecordList.Type(StepRecord),
+        tasks: quip.apps.RecordList.Type(TaskRecord),
+        links: quip.apps.RecordList.Type(LinkRecord),
         selected: "string",
         color: "string",
     });
 
     static getDefaultProperties = () => ({
-        steps: [],
+        tasks: [],
+        links: [],
         selected: "",
         color: quip.apps.ui.ColorMap.VIOLET.KEY,
     });
@@ -26,44 +28,30 @@ class RootRecord extends quip.apps.RootRecord {
         Object.keys(defaultValues).forEach((key, i) => {
             this.set(key, defaultValues[key]);
         });
-        [...Array(3)].map((_, i) => {
-            let step = this.get("steps").add({});
-            if (i === 0) {
-                this.set("selected", step.getId());
-            }
+        [...Array(2)].map((_, i) => {
+            let task = this.get("tasks").add({id: 'id-'+i, parent: null, text: 'Task #' + i, start_date: '15.04.2017', end_date: null, duration: 3, progress: 0.6});
         });
+        this.set("selected", "id-0");
+        this.get("links").add({id: 'link-1', source: 'id-0', target: 'id-1', type: '0'});
     }
 }
 
-class StepRecord extends quip.apps.RichTextRecord {
-    domNode: ?HTMLElement;
-    static CONSTRUCTOR_KEY = "Step";
+class TaskRecord extends quip.apps.Record {
+    static CONSTRUCTOR_KEY = "Task";
 
-    static getProperties() {
-        return {};
-    }
+    static getProperties = () => ({
+        id: "string",
+        parent: "string",
+        progress: "number",
+        text: "string",
+        start_date: "string",
+        end_date: "string",
+        duration: "number",
 
-    static getDefaultProperties() {
-        return {
-            RichText_placeholderText: quiptext("New Step"),
-        };
-    }
-
-    initialize(...args) {
-        super.initialize(...args);
-        this.notifyParent();
-    }
+    })
 
     supportsComments() {
         return true;
-    }
-
-    getDom() {
-        return this.domNode;
-    }
-
-    setDom(el: ?HTMLElement) {
-        this.domNode = el;
     }
 
     notifyParent() {
@@ -91,7 +79,19 @@ class StepRecord extends quip.apps.RichTextRecord {
     }
 }
 
+class LinkRecord extends quip.apps.Record {
+    static CONSTRUCTOR_KEY = "Link";
+
+    static getProperties = () => ({
+        id: "string",
+        source: "string",
+        target: "string",
+        type: "string"
+    })
+
+}
+
 export default () => {
-    const classes = [RootRecord, StepRecord];
+    const classes = [RootRecord, TaskRecord, LinkRecord];
     classes.forEach(c => quip.apps.registerClass(c, c.CONSTRUCTOR_KEY));
 };

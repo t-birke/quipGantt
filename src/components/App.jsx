@@ -4,53 +4,72 @@
 import quip from "quip";
 import React from "react";
 import Gantt from './Gantt';
+import Lightbox from './Lightbox';
 
 import Styles from "./App.less";
 import "./Gantt.css";
 
-import Step from "./Step.jsx";
-
-const data = {
-  data: [
-    {id: 1, text: 'Task #1', start_date: '15-04-2017', duration: 3, progress: 0.6},
-    {id: 2, text: 'Task #2', start_date: '18-04-2017', duration: 3, progress: 0.4}
-  ],
-  links: [
-    {id: 1, source: 1, target: 2, type: '0'}
-  ]
-};
-
 export default class App extends React.Component {
     static propTypes = {
         rootRecord: React.PropTypes.instanceOf(quip.apps.RootRecord).isRequired,
-        steps: React.PropTypes.instanceOf(quip.apps.RecordList).isRequired,
-        color: React.PropTypes.string.isRequired,
-        selected: React.PropTypes.string,
+        tasks: React.PropTypes.instanceOf(quip.apps.RecordList).isRequired,
+        links: React.PropTypes.instanceOf(quip.apps.RecordList).isRequired,
+        color: React.PropTypes.string.isRequired
     };
 
-    setSelected = record => {
-        this.props.rootRecord.set("selected", record.getId());
-    };
+    state = {
+        showLightbox: false,
+        task: null,
+        gantt: null,
+    }
 
-    deleteStep = record => {
-        const {steps, selected} = this.props;
-        const next = record.getPreviousSibling() || record.getNextSibling();
-        const isSelected = record.getId() === selected;
+    onShowLightbox = (task) => {
+        this.setState(() => ({"task": task}));
+        this.setState(() => ({"showLightbox": true}));
+    }
 
-        steps.remove(record);
+    onHideLightbox = () => {
+        this.setState({showLightbox: false});
+    }
 
-        if (isSelected && next) {
-            this.setSelected(next);
-        }
-
-        quip.apps.recordQuipMetric("delete_step");
-    };
+    setGantt = (gantt) => {
+        this.setState(() => ({"gantt": gantt}));
+    }
 
     render() {
-        const {steps, selected, color} = this.props;
+        const {tasks, links, color} = this.props;
+        console.log(this.props);
+        const formattedTasks = tasks.getRecords().map( task => ({
+                            id: task.get("id"),
+                            parent: task.get("parent"),
+                            progress: task.get("progress"),
+                            text: task.get("text"),
+                            start_date: task.get("start_date"),
+                            end_date: task.get("end_date"),
+                            duration: task.get("duration"),
+                        }
+                        ));
+        const formattedLinks = links.getRecords().map( link => ({
+            id: link.get("id"),
+            source: link.get("source"),
+            target: link.get("target"),
+            type: link.get("type")
+        }));
+        console.log("formattedLinks",JSON.stringify(formattedLinks));
+        const data = {data: formattedTasks, links: formattedLinks};
+        //console.log("data",JSON.stringify(data));
+        return (
+        <div tabIndex="0" className={Styles.container}>
+        { this.state.showLightbox && (
+            <Lightbox
+                onDismiss={this.onDialogDismiss}
+                task={this.state.task}
+                onHideLightbox={this.onHideLightbox}
+                gantt={this.state.gantt}
+                />
+            )
 
-        return <div tabIndex="0" className={Styles.container}>
-            {/*steps
+        /*steps
                 .getRecords()
                 .map(step => <Step
                     color={color}
@@ -59,9 +78,13 @@ export default class App extends React.Component {
                     record={step}
                     onSelected={this.setSelected}
                     onDelete={this.deleteStep}/>)*/}
-                    <div className="gantt-container">
-                      <Gantt tasks={data}/>
+                    <div className="gantt-container" id="gantt-container">
+                      <Gantt data={data}
+                            onShowLightbox={this.onShowLightbox}
+                            setGantt={this.setGantt}
+                            />
                     </div>
-        </div>;
+        </div>
+        );
     }
 }
