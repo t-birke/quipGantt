@@ -28,11 +28,13 @@ class RootRecord extends quip.apps.RootRecord {
         Object.keys(defaultValues).forEach((key, i) => {
             this.set(key, defaultValues[key]);
         });
-        [...Array(2)].map((_, i) => {
-            let task = this.get("tasks").add({id: 'id-'+i, parent: null, text: 'Task #' + i, start_date: '15.04.2017', end_date: null, duration: 3, progress: 0.6});
+        this.get("tasks").add({id: 'parent', parent: null, text: 'Project 1', type: 'project', start_date: null, end_date: null, duration: null, progress: 0.3});
+        [...Array(5)].map((_, i) => {
+            let task = this.get("tasks").add({id: 'id-'+i, parent: 'parent', text: 'Task #' + i, type: 'task', start_date: (15+(i*2))+'.04.2017', end_date: null, duration: 2, progress: 0.6});
+            i < 4 && (this.get("links").add({id: 'link-'+i, source: 'id-'+i, target: 'id-'+(i+1), type: '0'}));
         });
         this.set("selected", "id-0");
-        this.get("links").add({id: 'link-1', source: 'id-0', target: 'id-1', type: '0'});
+
     }
 }
 
@@ -44,6 +46,7 @@ class TaskRecord extends quip.apps.Record {
         parent: "string",
         progress: "number",
         text: "string",
+        type: "string",
         start_date: "string",
         end_date: "string",
         duration: "number",

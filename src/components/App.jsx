@@ -44,6 +44,7 @@ export default class App extends React.Component {
                             parent: task.get("parent"),
                             progress: task.get("progress"),
                             text: task.get("text"),
+                            type: task.get("type"),
                             start_date: task.get("start_date"),
                             end_date: task.get("end_date"),
                             duration: task.get("duration"),
@@ -55,7 +56,7 @@ export default class App extends React.Component {
             target: link.get("target"),
             type: link.get("type")
         }));
-        console.log("formattedLinks",JSON.stringify(formattedLinks));
+        console.log("formattedTasks",JSON.stringify(formattedTasks));
         const data = {data: formattedTasks, links: formattedLinks};
         //console.log("data",JSON.stringify(data));
         return (
