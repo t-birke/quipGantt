@@ -23,13 +23,15 @@ class Lightbox extends React.Component {
 /*
         const start_date = task.start_date.getDate() + "." + ((task.start_date.getMonth()+1) < 10 ? "0" + (task.start_date.getMonth()+1) : task.start_date.getMonth()+1) + "." + task.start_date.getFullYear()
 	      const end_date = task.end_date.getDate() + "." + ((task.end_date.getMonth()+1) < 10 ? "0" + (task.end_date.getMonth()+1) : task.end_date.getMonth()+1) + "." + task.end_date.getFullYear()
-	      */
-        const start_date = task.start_date.getFullYear() + "-" + ((task.start_date.getMonth()+1) < 10 ? "0" + (task.start_date.getMonth()+1) : task.start_date.getMonth()+1) + "-" + task.start_date.getDate()
-	      const end_date = task.end_date.getFullYear() + "-" + ((task.end_date.getMonth()+1) < 10 ? "0" + (task.end_date.getMonth()+1) : task.end_date.getMonth()+1) + "-" + task.end_date.getDate()
+	     const start_date = task.start_date.getFullYear() + "-" + ((task.start_date.getMonth()+1) < 10 ? "0" + (task.start_date.getMonth()+1) : task.start_date.getMonth()+1) + "-" + task.start_date.getDate()
+          const end_date = task.end_date.getFullYear() + "-" + ((task.end_date.getMonth()+1) < 10 ? "0" + (task.end_date.getMonth()+1) : task.end_date.getMonth()+1) + "-" + task.end_date.getDate()
+        */
+          //set date formatter
+        const formatDate = gantt.date.date_to_str("%d.%m.%Y");
 
         this.updateField(task.text,"newTaskName");
-        this.updateField(start_date,"newTaskStart");
-        this.updateField(end_date,"newTaskEnd");
+        this.updateField(formatDate(task.start_date),"newTaskStart");
+        this.updateField(formatDate(task.end_date),"newTaskEnd");
     }
 
     componentWillUnmount() {
@@ -38,7 +40,9 @@ class Lightbox extends React.Component {
     }
 
     render() {
-    		const { onDismiss,task, onHideLightbox, gantt } = this.props;
+    		const { onDismiss,task, onHideLightbox, gantt, tasks } = this.props;
+            const formatDate = gantt.date.date_to_str("%d.%m.%Y");
+            var formatDateStr = gantt.date.str_to_date("%d.%m.%Y");
         const dimensions = quip.apps.getCurrentDimensions();
         const style = {
             position: "absolute",
@@ -85,10 +89,24 @@ class Lightbox extends React.Component {
             <button onClick={() => {
             	let newTask = gantt.getTask(task.id)
             	newTask.text = this.state.newTaskName;
-            	newTask.start_date = new Date(this.state.newTaskStart);
-            	newTask.end_date = new Date(this.state.newTaskEnd);
+            	newTask.start_date = formatDateStr(this.state.newTaskStart);
+            	newTask.end_date = formatDateStr(this.state.newTaskEnd);
+                console.log("newTask", JSON.stringify(newTask));
             	gantt.updateTask(task.id);
             	gantt.render();
+                let existingRecord = tasks.getRecords().filter( taskRecord => (taskRecord.get("id") == task.id));
+                if(existingRecord.length > 0){
+
+
+
+                    existingRecord[0].set("text",this.state.newTaskName);
+                    existingRecord[0].set("start_date",formatDate(newTask.start_date));
+                    existingRecord[0].set("end_date",formatDate(newTask.end_date));
+                } else {
+                    let formattedParent = null;
+                    newTask.parent != 0 && (formattedParent = newTask.parent);
+                    tasks.add({id: ''+newTask.id, parent: formattedParent, text: newTask.text, type: newTask.type, start_date: formatDate(newTask.start_date), end_date: null, duration: newTask.duration, progress: newTask.progress});
+                }
             	onHideLightbox();
             }} >save</button>
           </div>

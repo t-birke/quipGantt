@@ -38,7 +38,7 @@ export default class App extends React.Component {
 
     render() {
         const {tasks, links, color} = this.props;
-        console.log(this.props);
+        console.log(this.state);
         const formattedTasks = tasks.getRecords().map( task => ({
                             id: task.get("id"),
                             parent: task.get("parent"),
@@ -67,6 +67,7 @@ export default class App extends React.Component {
                 task={this.state.task}
                 onHideLightbox={this.onHideLightbox}
                 gantt={this.state.gantt}
+                tasks={tasks}
                 />
             )
 

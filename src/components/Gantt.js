@@ -73,6 +73,7 @@ const mainGridConfig = {
     gantt.eachTask(function(task){
     task.$open = true;
     });
+    gantt.render();
     gantt.attachEvent("onLinkDblClick", function(id,e){console.log("onLinkDblClick")});
     gantt.showLightbox = (id) => {
       let task = gantt.getTask(id);
